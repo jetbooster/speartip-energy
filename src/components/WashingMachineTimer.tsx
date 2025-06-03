@@ -20,7 +20,7 @@ export default function WashingMachineTimer({ active }: { active: boolean }) {
         setRunning(false);
         clearTimeout(timeout);
       }
-    }, 100);
+    }, 1000 * 60);
     return () => clearTimeout(timeout);
   }, [running, minsRemaining]);
 
