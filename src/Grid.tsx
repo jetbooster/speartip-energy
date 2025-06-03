@@ -3,20 +3,11 @@ import Bolt from '@mui/icons-material/Bolt';
 import CurrencyPound from '@mui/icons-material/CurrencyPound';
 import SolarPower from '@mui/icons-material/SolarPower';
 import Grid from '@mui/material/Grid2';
-import Paper from '@mui/material/Paper';
-import { styled } from '@mui/material/styles';
 import { ElectricMeter } from './assets/icons';
-import Gauge from './Gauge';
+import Gauge from './components/Gauge';
 import { ValuesResponse } from './types/types';
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#000',
-  ...theme.typography.body2,
-  padding: theme.spacing(0),
-  textAlign: 'center',
-  height: '100%',
-
-}));
+import WashingMachineTimer from './components/WashingMachineTimer';
+import Item from './components/Item';
 
 interface DisplayGridProps {
   onClick: () => void;
@@ -38,7 +29,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
       <Grid size={{ xs: 2, sm: 4, md: 4 }}>
         <Item>
           <Gauge
-            val={Number(values.solar.toPrecision(3))}
+            val={Number(values.solar.toPrecision(2))}
             max={5.4}
             icon={<SolarPower />}
             colour="#166"
@@ -50,7 +41,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
       <Grid size={{ xs: 2, sm: 4, md: 4 }}>
         <Item>
           <Gauge
-            val={values.usage}
+            val={Number(values.usage.toPrecision(2))}
             exponential
             max={10}
             icon={<Bolt />}
@@ -75,7 +66,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
       <Grid size={{ xs: 2, sm: 4, md: 4 }}>
         <Item>
           <Gauge
-            val={Number(values.price.toPrecision(3))}
+            val={Number(values.price.toPrecision(2))}
             max={100}
             icon={<CurrencyPound />}
             colour="#616"
@@ -88,7 +79,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
       <Grid size={{ xs: 2, sm: 4, md: 4 }}>
         <Item>
           <Gauge
-            val={values.grid}
+            val={Number(values.grid.toPrecision(2))}
             exponential
             max={10}
             icon={<ElectricMeter />}
@@ -99,18 +90,9 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
           />
         </Item>
       </Grid>
-      {/* <Grid size={{ xs: 2, sm: 4, md: 4 }}>
-        <Item>
-          <Gauge
-            val={0}
-            max={100}
-            icon={<QuestionMark />}
-            active={active}
-            colour="#666"
-            units={{ normal: "" }}
-          />
-        </Item>
-      </Grid> */}
+      <Grid size={{ xs: 2, sm: 4, md: 4 }}>
+        <WashingMachineTimer active={active} />
+      </Grid>
 
     </Grid>
   );

@@ -1,6 +1,6 @@
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { ReactNode, useEffect, useState } from 'react';
-import useWindowDimensions from './hooks/useWindowDimentions';
+import useWindowDimensions from '../hooks/useWindowDimentions';
 
 interface GaugeProps {
   val: number;
@@ -12,6 +12,7 @@ interface GaugeProps {
     normal: string;
     milli?: string;
     noSpace?: boolean;
+    convertMinsToHrMins?: boolean;
   };
   active?: boolean;
   startAngle?: number;
@@ -21,6 +22,12 @@ interface GaugeProps {
 function BezierBlend(t: number) {
   return t * t * (3 - (2 * t));
 }
+
+const convertToHoursMins = (n: number, s: string) => {
+  const hrs = Math.floor(n / 60);
+  const mins = n - hrs * 60;
+  return `${hrs}${s}${mins.toString().padStart(2, '0')}`;
+};
 
 export default function MyGauge({
   val,
@@ -36,10 +43,16 @@ export default function MyGauge({
   const { height, width } = useWindowDimensions();
 
   const transformWithUnits = (): string => {
-    if (units?.milli && Math.abs(val) < 0.9) {
+    if (units?.convertMinsToHrMins) {
+      if (units.kilo === '.') {
+        return '';
+      }
+      return convertToHoursMins(val, units.normal);
+    }
+    if (units?.milli && Math.abs(val) < 1.0) {
       return `${val * 1000}${units.noSpace ? '' : ' '}${units?.milli}`;
     }
-    if (units?.kilo && Math.abs(val) > 900) {
+    if (units?.kilo && Math.abs(val) > 1000) {
       return `${val / 1000}${units.noSpace ? '' : ' '}${units?.kilo}`;
     }
     return `${val}${units?.noSpace ? '' : ' '}${units?.normal}`;
