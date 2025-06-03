@@ -1,0 +1,321 @@
+[
+  {
+    "todayYield": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "Today’s power generation",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "pvPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "PVPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "RPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "RPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "ambientTemperation": {
+      "unit": "℃",
+      "Grid-tied inverter": true,
+      "name": "AmbientTemperature",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "boostTemperation": {
+      "unit": "℃",
+      "Grid-tied inverter": true,
+      "name": "BoostTemperature",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "invTemperation": {
+      "unit": "℃",
+      "Grid-tied inverter": true,
+      "name": "InvTemperation",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "chargeTemperature": {
+      "unit": "℃",
+      "Grid-tied inverter": true,
+      "name": "ChargeTemperature",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batTemperature": {
+      "unit": "℃",
+      "Grid-tied inverter": false,
+      "name": "batTemperature",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "dspTemperature": {
+      "unit": "℃",
+      "Grid-tied inverter": true,
+      "name": "DSPTemperature",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "loadsPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "Load Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "loadsPowerR": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "LoadsRPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "loadsPowerS": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "LoadsSPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "loadsPowerT": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "LoadsTPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "generationPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "Output Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "feedinPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "Feed-in Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "gridConsumptionPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "GridConsumption Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "invBatVolt": {
+      "unit": "V",
+      "Grid-tied inverter": true,
+      "name": "InvBatVolt",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "invBatCurrent": {
+      "unit": "A",
+      "Grid-tied inverter": false,
+      "name": "InvBatCurrent",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "invBatPower": {
+      "unit": "kW",
+      "Grid-tied inverter": false,
+      "name": "invBatPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batChargePower": {
+      "unit": "kW",
+      "Grid-tied inverter": false,
+      "name": "Charge Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batDischargePower": {
+      "unit": "kW",
+      "Grid-tied inverter": false,
+      "name": "Discharge Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batVolt": {
+      "unit": "V",
+      "Grid-tied inverter": false,
+      "name": "BatVolt",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batCurrent": {
+      "unit": "A",
+      "Grid-tied inverter": false,
+      "name": "BatCurrent",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "meterPower": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "MeterPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "meterPower2": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "Meter2Power",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "meterPowerR": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "MeterRPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "meterPowerS": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "MeterSPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "meterPowerT": {
+      "unit": "kW",
+      "Grid-tied inverter": true,
+      "name": "MeterTPower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "SoC": {
+      "unit": "%",
+      "Grid-tied inverter": false,
+      "name": "SoC",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "ReactivePower": {
+      "unit": "kVar",
+      "Grid-tied inverter": true,
+      "name": "ReactivePower",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "PowerFactor": {
+      "Grid-tied inverter": true,
+      "name": "PowerFactor",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "generation": {
+      "unit": "kWh",
+      "Grid-tied inverter": true,
+      "name": "Cumulative power generation",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "ResidualEnergy": {
+      "unit": "0.01kWh",
+      "Grid-tied inverter": false,
+      "name": "Battery Residual Energy",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "runningState": {
+      "Grid-tied inverter": true,
+      "name": "Running State",
+      "Energy-storage inverter": true,
+      "enum": {
+        "160": "self-test",
+        "161": "waiting",
+        "162": "checking",
+        "163": "on-grid",
+        "164": "off-grid",
+        "165": "fault",
+        "166": "permanent-fault",
+        "167": "standby",
+        "168": "upgrading",
+        "169": "fct",
+        "170": "illegal"
+      }
+    }
+  },
+  {
+    "batStatus": {
+      "Grid-tied inverter": false,
+      "name": "Battery Status",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "batStatusV2": {
+      "Grid-tied inverter": false,
+      "name": "Battery Status Name",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "currentFault": {
+      "Grid-tied inverter": true,
+      "name": "The current error code is reported",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "currentFaultCount": {
+      "Grid-tied inverter": true,
+      "name": "The number of errors",
+      "Energy-storage inverter": true
+    }
+  },
+  {
+    "energyThroughput": {
+      "unit": "Wh",
+      "Grid-tied inverter": false,
+      "name": "Battery throughput",
+      "Energy-storage inverter": true
+    }
+  }
+]

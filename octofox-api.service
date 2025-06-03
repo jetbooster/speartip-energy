@@ -1,0 +1,13 @@
+[Unit]
+Description=Octofox API
+After=network-online.target
+
+[Service]
+Restart=on-failure
+WorkingDirectory=/home/ubuntu/workspace/live-foxcloud-data-app/server
+Type=simple
+User=ubuntu
+ExecStart=/home/ubuntu/.bun/bin/bun run index.ts
+
+[Install]
+WantedBy=multi-user.target
