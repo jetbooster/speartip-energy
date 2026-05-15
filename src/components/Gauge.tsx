@@ -77,12 +77,12 @@ export default function MyGauge({
       startAngle={startAngle}
       endAngle={120}
       cornerRadius={80}
+      height={height <= width ? (height / 2) : (height / 3)}
       sx={theme => ({
         filter: `${active ? 'brightness(230%)' : ''}`,
         color: colour,
         [`& .${gaugeClasses.valueArc}`]: {
           'fill': colour ?? theme.palette.primary.main,
-          // transition: "0.2s",
           '& path': {
           },
         },
@@ -102,6 +102,9 @@ export default function MyGauge({
             transform: `translate(0px, ${height > width ? '0px' : '-0.1vh'}) scale(0.45)`,
             transformOrigin: 'center center',
           },
+        },
+        [`& .${gaugeClasses.root}`]: {
+          height: '200px',
         },
       })}
       text={transformWithUnits}

@@ -2,6 +2,8 @@ import { type ValuesResponse } from '../src/types/types';
 import { getValues, getVariables } from './foxcloud';
 import { getRateNow } from './octopus';
 
+console.log("Speartip Api backend started")
+
 Bun.serve({
   port: 29999,
   async fetch(req) {

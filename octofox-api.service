@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Restart=on-failure
-WorkingDirectory=/home/ubuntu/workspace/live-foxcloud-data-app/server
+WorkingDirectory=/home/ubuntu/workspace/speartip-energy/server
 Type=simple
 User=ubuntu
 ExecStart=/home/ubuntu/.bun/bin/bun run index.ts
