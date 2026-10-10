@@ -25,7 +25,7 @@ const fetchAndSign = (path: string, init?: RequestInit, params: Record<string, s
       url.searchParams.append(key, val);
     });
   }
-  return global.fetch(url, {
+  return global.fetch(url.toString(), {
     ...init,
     headers: {
       ...init?.headers,

@@ -5,7 +5,7 @@ import SolarPower from '@mui/icons-material/SolarPower';
 import Grid from '@mui/material/Grid2';
 import { ElectricMeter } from './assets/icons';
 import Gauge from './components/Gauge';
-import { ValuesResponse } from './types/types';
+import type { ValuesResponse } from './types/types';
 import WashingMachineTimer from './components/WashingMachineTimer';
 import Item from './components/Item';
 

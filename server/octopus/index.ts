@@ -1,6 +1,6 @@
 import { add, addDays, startOfDay } from 'date-fns';
 import { formatToIsoNoMilliseconds, parseIsoNoMilliSeconds } from '../utils';
-import { FullRate, RatesResponse } from './types';
+import type { FullRate, RatesResponse } from './types';
 
 // eslint-disable-next-line @stylistic/max-len
 const OCTOPUS_RATES_URL = 'https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-G/standard-unit-rates/';

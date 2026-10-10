@@ -5,7 +5,7 @@ import { getRateNow } from './octopus';
 
 const distDir = path.join(import.meta.dir, '..', 'dist');
 
-console.log("Speartip Api backend started")
+console.log('Speartip Api backend started');
 
 Bun.serve({
   port: 29999,

@@ -22,6 +22,13 @@ const FLOW_GREEN = '#2ecc40';
 const FLOW_RED = '#ff4136';
 const FLOW_EPSILON = 0.005;
 
+// Everything is sized in em from this base, which scales with the smaller viewport dimension.
+// Reaches 16px (the desktop look) at 1300px and is clamped so phones stay readable.
+const BASE_FONT_SIZE = 'clamp(10px, calc(min(100vw, 100vh) * 0.0123), 16px)';
+
+// Matches the old 100px drawing size at the 16px base.
+const DRAWN_SIZE_EM = 6.25;
+// Coordinate space for the chevrons; the SVG scales to DRAWN_SIZE_EM.
 const SIZE = 100;
 // Ordered from the back of the arrow to the front, so stepping through them
 // makes the chevron appear to travel along the direction of flow.
@@ -82,7 +89,8 @@ export default function FlowArrow({ axis, kw, inverted = false, left, top, activ
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '2px',
+        gap: '0.125em',
+        fontSize: BASE_FONT_SIZE,
         pointerEvents: 'none',
         zIndex: 1,
         color: colour,
@@ -92,10 +100,8 @@ export default function FlowArrow({ axis, kw, inverted = false, left, top, activ
 
       <Box
         component="svg"
-        width={SIZE}
-        height={SIZE}
         viewBox={`0 0 ${SIZE} ${SIZE}`}
-        sx={{ overflow: 'visible' }}
+        sx={{ width: `${DRAWN_SIZE_EM}em`, height: `${DRAWN_SIZE_EM}em`, overflow: 'visible' }}
       >
         {CHEVRON_OFFSETS.map((offset, i) => {
           const isActive = i === step;
@@ -120,7 +126,7 @@ export default function FlowArrow({ axis, kw, inverted = false, left, top, activ
       </Box>
       <Box
         component="span"
-        sx={{ fontWeight: 600, fontSize: '1.5rem', whiteSpace: 'nowrap', order: axis === 'vertical' ? 2 : 0 }}
+        sx={{ fontWeight: 600, fontSize: '1.5em', whiteSpace: 'nowrap', order: axis === 'vertical' ? 2 : 0 }}
       >
         {formatKw(kw)}
       </Box>

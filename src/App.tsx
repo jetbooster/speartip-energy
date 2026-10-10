@@ -2,7 +2,7 @@ import { Alert, CircularProgress, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { fetchValues } from './fetch';
 import DisplayGrid from './Grid';
-import { ValuesResponse } from './types/types';
+import type { ValuesResponse } from './types/types';
 
 export default function App() {
   const [active, setActive] = useState(false);
@@ -19,7 +19,6 @@ export default function App() {
   useEffect(() => {
     const loadValues = () => fetchValues()
       .then((data) => {
-        console.log(data);
         setValues(data);
         setConnectionError(false);
       })
@@ -30,7 +29,7 @@ export default function App() {
       return;
     }
     const pollInterval = 3 * 60 * 1000;
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     if (active) {
       timeout = setTimeout(() => {
         setActive(false);

@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-import { ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import useWindowDimensions from '../hooks/useWindowDimentions';
 import FlowArrow from './FlowArrow';
 
