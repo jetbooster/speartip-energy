@@ -3,5 +3,6 @@ export interface ValuesResponse {
   usage: number;
   grid: number;
   batteryCharge: number;
+  batteryPower: number;
   price: number;
 }

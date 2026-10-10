@@ -1,6 +1,8 @@
+import Box from '@mui/material/Box';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { ReactNode, useEffect, useState } from 'react';
 import useWindowDimensions from '../hooks/useWindowDimentions';
+import FlowArrow from './FlowArrow';
 
 interface GaugeProps {
   val: number;
@@ -17,6 +19,8 @@ interface GaugeProps {
   active?: boolean;
   startAngle?: number;
   exponential?: boolean;
+  // Signed flow in kW: positive shows a green arrow to the right, negative a red arrow to the left.
+  diff?: number;
 }
 
 function BezierBlend(t: number) {
@@ -38,6 +42,7 @@ export default function MyGauge({
   active = false,
   startAngle = -120,
   exponential = false,
+  diff,
 }: GaugeProps) {
   const [slowVal, setSlowVal] = useState(val);
   const { height, width } = useWindowDimensions();
@@ -72,44 +77,55 @@ export default function MyGauge({
   }, [val]);
 
   return (
-    <Gauge
-      value={exponential ? (Math.pow(slowVal / max, 0.3) * 100) : ((slowVal / max) * 100)}
-      startAngle={startAngle}
-      endAngle={120}
-      cornerRadius={80}
-      height={height <= width ? (height / 2) : (height / 3)}
-      sx={theme => ({
-        filter: `${active ? 'brightness(230%)' : ''}`,
-        color: colour,
-        [`& .${gaugeClasses.valueArc}`]: {
-          'fill': colour ?? theme.palette.primary.main,
-          '& path': {
+    <Box sx={{ position: 'relative' }}>
+      <Gauge
+        value={exponential ? (Math.pow(slowVal / max, 0.3) * 100) : ((slowVal / max) * 100)}
+        startAngle={startAngle}
+        endAngle={120}
+        cornerRadius={80}
+        height={height <= width ? (height / 2) : (height / 3)}
+        sx={theme => ({
+          filter: `${active ? 'brightness(230%)' : ''}`,
+          color: colour,
+          [`& .${gaugeClasses.valueArc}`]: {
+            'fill': colour ?? theme.palette.primary.main,
+            '& path': {
+            },
           },
-        },
-        [`& .${gaugeClasses.valueText}`]: {
-          fontSize: height > width ? '8vw' : '11.5vh',
-          fontWeight: 500,
-          transform: `translate(0px, ${height > width ? '9vw' : '9vh'})`,
-        },
-        [`& .${gaugeClasses.valueText} text`]: {
-          fill: active ? '#bbb' : '#888',
-        },
-        [`& .${gaugeClasses.referenceArc}`]: {
-          fill: '#0b0b0b',
-        },
-        ['& .MuiSvgIcon-root']: {
-          '& path': {
-            transform: `translate(0px, ${height > width ? '0px' : '-0.1vh'}) scale(0.45)`,
-            transformOrigin: 'center center',
+          [`& .${gaugeClasses.valueText}`]: {
+            fontSize: height > width ? '8vw' : '11.5vh',
+            fontWeight: 500,
+            transform: `translate(0px, ${height > width ? '9vw' : '9vh'})`,
           },
-        },
-        [`& .${gaugeClasses.root}`]: {
-          height: '200px',
-        },
-      })}
-      text={transformWithUnits}
-    >
-      {icon}
-    </Gauge>
+          [`& .${gaugeClasses.valueText} text`]: {
+            fill: active ? '#bbb' : '#888',
+          },
+          [`& .${gaugeClasses.referenceArc}`]: {
+            fill: '#0b0b0b',
+          },
+          ['& .MuiSvgIcon-root']: {
+            '& path': {
+              transform: `translate(0px, ${height > width ? '0px' : '-0.1vh'}) scale(0.45)`,
+              transformOrigin: 'center center',
+            },
+          },
+          [`& .${gaugeClasses.root}`]: {
+            height: '200px',
+          },
+        })}
+        text={transformWithUnits}
+      >
+        {icon}
+      </Gauge>
+      {diff !== undefined && (
+        <FlowArrow
+          axis="vertical"
+          kw={diff}
+          left="33%"
+          top="48%"
+          active={active}
+        />
+      )}
+    </Box>
   );
 }

@@ -43,6 +43,13 @@ export default function WashingMachineTimer({ active }: { active: boolean }) {
       return;
     }
     if (running) {
+      if (minsRemaining < 30) {
+        setRunning(false);
+        setAlerting(false);
+        setMinsRemaining(0);
+        return;
+      }
+      setMinsRemaining(r => r - 30);
       return;
     }
     setRunning(true);

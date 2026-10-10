@@ -60,6 +60,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
             colour="#066006"
             units={{ normal: '%', noSpace: true }}
             active={active}
+            diff={values.batteryPower}
           />
         </Item>
       </Grid>

@@ -1,6 +1,9 @@
+import path from 'path';
 import { type ValuesResponse } from '../src/types/types';
 import { getValues, getVariables } from './foxcloud';
 import { getRateNow } from './octopus';
+
+const distDir = path.join(import.meta.dir, '..', 'dist');
 
 console.log("Speartip Api backend started")
 
@@ -8,7 +11,6 @@ Bun.serve({
   port: 29999,
   async fetch(req) {
     const url = new URL(req.url);
-    console.log(url);
     switch (url.pathname) {
       case '/api/values': {
         const octopusPromise = getRateNow();
@@ -20,6 +22,7 @@ Bun.serve({
           usage: foxcloudResult['loadsPower'].value,
           grid: foxcloudResult['meterPower'].value,
           batteryCharge: foxcloudResult['SoC'].value,
+          batteryPower: foxcloudResult['batChargePower'].value - foxcloudResult['batDischargePower'].value,
           price: octopusResult,
         } as ValuesResponse));
       }
@@ -27,9 +30,17 @@ Bun.serve({
         return new Response(JSON.stringify(await getVariables()));
       }
       default: {
-        return new Response('Not Found', {
-          status: 404,
-        });
+        if (url.pathname.startsWith('/api/')) {
+          return new Response('Not Found', { status: 404 });
+        }
+        const requestedPath = path.join(distDir, url.pathname);
+        if (requestedPath.startsWith(distDir + path.sep)) {
+          const requested = Bun.file(requestedPath);
+          if (await requested.exists()) {
+            return new Response(requested);
+          }
+        }
+        return new Response(Bun.file(path.join(distDir, 'index.html')));
       }
     }
   },

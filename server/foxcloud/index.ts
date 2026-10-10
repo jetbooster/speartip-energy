@@ -39,7 +39,7 @@ export const getValues = async (): Promise<Record<string, DeviceQueryBody['datas
   const res = await fetchAndSign('/op/v0/device/real/query', {
     method: 'POST',
     body: JSON.stringify({
-      variables: ['pvPower', 'meterPower', 'SoC', 'loadsPower'],
+      variables: ['pvPower', 'meterPower', 'SoC', 'loadsPower', 'batChargePower', 'batDischargePower'],
       sn: FOXCLOUD_SN as string,
     }),
   });
