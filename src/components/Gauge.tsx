@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-import { type ReactNode, useEffect, useState } from 'react';
-import useWindowDimensions from '../hooks/useWindowDimentions';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+import useWindowDimensions from '../hooks/useWindowDimensions';
 import FlowArrow from './FlowArrow';
 
 interface GaugeProps {
@@ -22,6 +22,8 @@ interface GaugeProps {
   // Signed flow in kW: positive shows a green arrow to the right, negative a red arrow to the left.
   diff?: number;
 }
+
+const TWEEN_MS = 1000;
 
 function BezierBlend(t: number) {
   return t * t * (3 - (2 * t));
@@ -44,7 +46,9 @@ export default function MyGauge({
   exponential = false,
   diff,
 }: GaugeProps) {
-  const [slowVal, setSlowVal] = useState(val);
+  // x-charts doesn't animate the arc, so we tween the displayed value towards `val`.
+  const [shown, setShown] = useState(val);
+  const shownRef = useRef(val);
   const { height, width } = useWindowDimensions();
 
   const transformWithUnits = (): string => {
@@ -64,22 +68,26 @@ export default function MyGauge({
   };
 
   useEffect(() => {
-    const initSlowVal = slowVal;
-    let curr = 0;
-    const interval = setInterval(() => {
-      setSlowVal(initSlowVal + BezierBlend(curr) * (val - initSlowVal));
-      curr += 0.02;
-      if (curr >= 1) {
-        clearInterval(interval);
+    const from = shownRef.current;
+    const start = performance.now();
+    let frame = 0;
+    const step = (now: number) => {
+      const t = Math.min((now - start) / TWEEN_MS, 1);
+      const next = from + BezierBlend(t) * (val - from);
+      shownRef.current = next;
+      setShown(next);
+      if (t < 1) {
+        frame = requestAnimationFrame(step);
       }
-    }, 20);
-    return () => clearInterval(interval);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
   }, [val]);
 
   return (
     <Box sx={{ position: 'relative' }}>
       <Gauge
-        value={exponential ? (Math.pow(slowVal / max, 0.3) * 100) : ((slowVal / max) * 100)}
+        value={exponential ? (Math.pow(shown / max, 0.3) * 100) : ((shown / max) * 100)}
         startAngle={startAngle}
         endAngle={120}
         cornerRadius={80}

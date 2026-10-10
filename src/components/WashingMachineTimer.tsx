@@ -1,70 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { MouseEvent } from 'react';
 import Item from './Item';
 import Gauge from './Gauge';
 import { LocalLaundryService } from '@mui/icons-material';
 
+const MINUTE_MS = 60 * 1000;
+// 3.5h is roughly long enough for a complete cycle
+const CYCLE_MS = 3.5 * 60 * MINUTE_MS;
+const STEP_MS = 30 * MINUTE_MS;
+const BLINK_MS = 500;
+
 export default function WashingMachineTimer({ active }: { active: boolean }) {
-  const [minsRemaining, setMinsRemaining] = useState(0);
-  const [alerting, setAlerting] = useState(false);
-  const [running, setRunning] = useState(false);
-  const [flashState, setFlashState] = useState(false);
+  // Wall-clock end time, so the countdown doesn't drift when timers are throttled.
+  const [endsAt, setEndsAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
+  const remainingMs = endsAt === null ? 0 : Math.max(0, endsAt - now);
+  const alerting = endsAt !== null && remainingMs === 0;
+  const counting = endsAt !== null && !alerting;
+  const minsRemaining = Math.ceil(remainingMs / MINUTE_MS);
+  const blink = endsAt !== null && Math.floor(now / BLINK_MS) % 2 === 0;
+
+  // Only ticks while there is a timer to show.
   useEffect(() => {
-    if (!running) {
+    if (endsAt === null) {
       return;
     }
-    const timeout = setTimeout(() => {
-      setMinsRemaining(r => r - 1);
-      if (minsRemaining === 1) {
-        setAlerting(true);
-        setRunning(false);
-        clearTimeout(timeout);
-      }
-    }, 1000 * 60);
-    return () => clearTimeout(timeout);
-  }, [running, minsRemaining]);
+    const id = setInterval(() => setNow(Date.now()), BLINK_MS);
+    return () => clearInterval(id);
+  }, [endsAt]);
 
-  useEffect(() => {
-    if (!running && !alerting) {
-      return;
-    }
-    const interval = setInterval(() => {
-      setFlashState(prev => !prev);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [running, alerting]);
-
-  const onClick = (event: React.MouseEvent<HTMLElement>) => {
+  const onClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     if (alerting) {
-      setMinsRemaining(0);
-      setAlerting(false);
+      setEndsAt(null);
       return;
     }
-    if (running) {
-      if (minsRemaining < 30) {
-        setRunning(false);
-        setAlerting(false);
-        setMinsRemaining(0);
+    if (counting) {
+      if (remainingMs < STEP_MS) {
+        setEndsAt(null);
         return;
       }
-      setMinsRemaining(r => r - 30);
+      setEndsAt(end => (end ?? 0) - STEP_MS);
       return;
     }
-    setRunning(true);
-    setAlerting(false);
-    // 3.5h roughly long enough for complete cycle
-    setMinsRemaining(3.5 * 60);
+    const current = Date.now();
+    setNow(current);
+    setEndsAt(current + CYCLE_MS);
   };
 
   return (
-    <Item onClick={event => onClick(event)}>
+    <Item onClick={onClick}>
       <Gauge
         val={minsRemaining}
-        max={3.5 * 60}
-        units={{ convertMinsToHrMins: true, normal: flashState ? ' ' : ':', kilo: alerting && flashState ? '.' : '' }}
-        active={(active || running) || (alerting && !flashState)}
+        max={CYCLE_MS / MINUTE_MS}
+        units={{ convertMinsToHrMins: true, normal: blink ? ' ' : ':', kilo: alerting && blink ? '.' : '' }}
+        active={active || counting || (alerting && !blink)}
         colour="#666"
         icon={<LocalLaundryService />}
       />

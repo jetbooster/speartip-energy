@@ -1,6 +1,5 @@
 import { keyframes } from '@emotion/react';
 import Box from '@mui/material/Box';
-import { useEffect, useState } from 'react';
 
 export type FlowAxis = 'horizontal' | 'vertical';
 
@@ -30,16 +29,19 @@ const BASE_FONT_SIZE = 'clamp(10px, calc(min(100vw, 100vh) * 0.0123), 16px)';
 const DRAWN_SIZE_EM = 6.25;
 // Coordinate space for the chevrons; the SVG scales to DRAWN_SIZE_EM.
 const SIZE = 100;
-// Ordered from the back of the arrow to the front, so stepping through them
-// makes the chevron appear to travel along the direction of flow.
+// Ordered from the back of the arrow to the front, so each lights up in turn and
+// the cycle appears to travel along the direction of flow.
 const CHEVRON_OFFSETS = [-25, 0, 25];
 const CHEVRON_ARM = 13;
 const CHEVRON_SPREAD = 20;
 const FRAME_MS = 500;
+const CYCLE_MS = FRAME_MS * CHEVRON_OFFSETS.length;
 
+// Each chevron is lit for one FRAME_MS slot of the cycle, peaking halfway through it.
 const fade = keyframes`
   0% { opacity: 0.2; }
-  50% { opacity: 1; }
+  16.7% { opacity: 1; }
+  33.3% { opacity: 0.2; }
   100% { opacity: 0.2; }
 `;
 
@@ -54,14 +56,6 @@ export default function FlowArrow({ axis, kw, inverted = false, left, top, activ
   const [px, py] = [-uy, ux];
   const colour = sign > 0 ? FLOW_GREEN : FLOW_RED;
   const centre = SIZE / 2;
-
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => {
-      setStep(s => (s + 1) % CHEVRON_OFFSETS.length);
-    }, FRAME_MS);
-    return () => clearInterval(id);
-  }, []);
 
   if (Math.abs(kw) < FLOW_EPSILON) {
     return null;
@@ -103,26 +97,22 @@ export default function FlowArrow({ axis, kw, inverted = false, left, top, activ
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         sx={{ width: `${DRAWN_SIZE_EM}em`, height: `${DRAWN_SIZE_EM}em`, overflow: 'visible' }}
       >
-        {CHEVRON_OFFSETS.map((offset, i) => {
-          const isActive = i === step;
-          return (
-            <Box
-              component="polyline"
-              // Keyed on the step while active so the fade restarts each time it comes round.
-              key={isActive ? `active-${step}` : `idle-${i}`}
-              points={chevronPoints(offset)}
-              fill="none"
-              stroke={colour}
-              strokeWidth={6}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              sx={{
-                opacity: 0.2,
-                animation: isActive ? `${fade} ${FRAME_MS}ms ease-in-out` : 'none',
-              }}
-            />
-          );
-        })}
+        {CHEVRON_OFFSETS.map((offset, i) => (
+          <Box
+            component="polyline"
+            key={offset}
+            points={chevronPoints(offset)}
+            fill="none"
+            stroke={colour}
+            strokeWidth={6}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            sx={{
+              opacity: 0.2,
+              animation: `${fade} ${CYCLE_MS}ms ease-in-out ${i * FRAME_MS}ms infinite`,
+            }}
+          />
+        ))}
       </Box>
       <Box
         component="span"

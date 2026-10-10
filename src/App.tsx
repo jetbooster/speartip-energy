@@ -1,8 +1,11 @@
 import { Alert, CircularProgress, Snackbar } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchValues } from './fetch';
 import DisplayGrid from './Grid';
 import type { ValuesResponse } from './types/types';
+
+const POLL_INTERVAL_MS = 3 * 60 * 1000;
+const ACTIVE_TIMEOUT_MS = 3 * 60 * 1000;
 
 export default function App() {
   const [active, setActive] = useState(false);
@@ -11,11 +14,17 @@ export default function App() {
 
   const [connectionError, setConnectionError] = useState(false);
 
+  const activeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Activity is a user event, so the timeout is scheduled here rather than in an effect.
   const onClick = () => {
     setActive(true);
-    document.querySelector('body')!.requestFullscreen();
+    clearTimeout(activeTimer.current);
+    activeTimer.current = setTimeout(() => setActive(false), ACTIVE_TIMEOUT_MS);
+    document.body.requestFullscreen();
   };
 
+  // Polling is independent of `active`. Failed polls retry on the next tick.
   useEffect(() => {
     const loadValues = () => fetchValues()
       .then((data) => {
@@ -24,24 +33,10 @@ export default function App() {
       })
       .catch(() => setConnectionError(true));
 
-    if (!values) {
-      loadValues();
-      return;
-    }
-    const pollInterval = 3 * 60 * 1000;
-    let timeout: ReturnType<typeof setTimeout>;
-    if (active) {
-      timeout = setTimeout(() => {
-        setActive(false);
-      }, pollInterval);
-    }
     loadValues();
-    const interval = setInterval(loadValues, pollInterval);
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [active]);
+    const interval = setInterval(loadValues, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
