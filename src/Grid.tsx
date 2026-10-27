@@ -1,6 +1,6 @@
 import BatteryChargingFull from '@mui/icons-material/BatteryChargingFull';
 import Bolt from '@mui/icons-material/Bolt';
-import CurrencyPound from '@mui/icons-material/CurrencyPound';
+import ElectricCar from '@mui/icons-material/ElectricCar';
 import SolarPower from '@mui/icons-material/SolarPower';
 import Grid from '@mui/material/Grid2';
 import { ElectricMeter } from './assets/icons';
@@ -14,6 +14,26 @@ interface DisplayGridProps {
   values: ValuesResponse;
   active: boolean;
 }
+
+const STALE_AFTER_MS = 6 * 60 * 60 * 1000;
+
+// Status shown under the car dial. Plugged-in state takes priority over the age of the reading.
+const carSubLabel = (values: ValuesResponse): string | undefined => {
+  if (!values.charger) {
+    return 'No charger data';
+  }
+  if (!values.charger.carConnected) {
+    return 'Unplugged';
+  }
+  if (values.charger.carAwaitingAuthorization) {
+    return 'Awaiting authorisation';
+  }
+  if (values.carChargeLevelUpdatedAt && Date.now() - Date.parse(values.carChargeLevelUpdatedAt) > STALE_AFTER_MS) {
+    const hours = Math.floor((Date.now() - Date.parse(values.carChargeLevelUpdatedAt)) / (60 * 60 * 1000));
+    return `Updated ${hours}h ago`;
+  }
+  return undefined;
+};
 
 export default function DisplayGrid({ onClick, values, active }: DisplayGridProps) {
   return (
@@ -67,13 +87,16 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
       <Grid size={{ xs: 2, sm: 4, md: 4 }}>
         <Item>
           <Gauge
-            val={Number(values.price.toPrecision(2))}
+            val={values.carChargeLevel ?? 0}
             max={100}
-            icon={<CurrencyPound />}
-            colour="#616"
-            units={{ normal: 'p', noSpace: true }}
+            icon={<ElectricCar />}
+            colour="#036"
+            units={{ normal: '%', noSpace: true }}
+            text={values.carChargeLevel === null ? '—' : undefined}
             active={active}
-            startAngle={-90}
+            // Charger power only shows as a flow while a car is plugged in.
+            diff={values.charger?.carConnected ? (values.charger.totalPower ?? 0) : undefined}
+            subLabel={carSubLabel(values)}
           />
         </Item>
       </Grid>
@@ -88,6 +111,7 @@ export default function DisplayGrid({ onClick, values, active }: DisplayGridProp
             colour="#666"
             units={{ normal: 'kW', milli: 'W' }}
             startAngle={-90}
+            subLabel={`${Number(values.price.toPrecision(2))}p`}
           />
         </Item>
       </Grid>

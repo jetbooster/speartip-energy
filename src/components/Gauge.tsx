@@ -21,6 +21,10 @@ interface GaugeProps {
   exponential?: boolean;
   // Signed flow in kW: positive shows a green arrow to the right, negative a red arrow to the left.
   diff?: number;
+  // Replaces the formatted value in the centre, e.g. a placeholder when there is no reading.
+  text?: string;
+  // Small line of text under the dial, e.g. a rate or status.
+  subLabel?: ReactNode;
 }
 
 const TWEEN_MS = 1000;
@@ -45,6 +49,8 @@ export default function MyGauge({
   startAngle = -120,
   exponential = false,
   diff,
+  text,
+  subLabel,
 }: GaugeProps) {
   // x-charts doesn't animate the arc, so we tween the displayed value towards `val`.
   const [shown, setShown] = useState(val);
@@ -121,7 +127,7 @@ export default function MyGauge({
             height: '200px',
           },
         })}
-        text={transformWithUnits}
+        text={() => text ?? transformWithUnits()}
       >
         {icon}
       </Gauge>
@@ -133,6 +139,24 @@ export default function MyGauge({
           top="48%"
           active={active}
         />
+      )}
+      {subLabel !== undefined && (
+        <Box
+          sx={{
+            position: 'absolute',
+            // Right of centre, opposite the battery arrow, so a flow arrow on the left never overlaps it.
+            left: '27%',
+            top: '45%',
+            transform: 'translate(-50%, -50%)',
+            // Same size as the FlowArrow label, so the two read as a pair.
+            fontSize: '3rem',
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            color: active ? '#f050f8' : '#552058',
+          }}
+        >
+          {subLabel}
+        </Box>
       )}
     </Box>
   );
