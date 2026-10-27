@@ -144,12 +144,11 @@ export default function MyGauge({
         <Box
           sx={{
             position: 'absolute',
-            // Right of centre, opposite the battery arrow, so a flow arrow on the left never overlaps it.
-            left: '27%',
+            left: '31%',
             top: '45%',
             transform: 'translate(-50%, -50%)',
             // Same size as the FlowArrow label, so the two read as a pair.
-            fontSize: '3rem',
+            fontSize: 'clamp(16px, calc(min(100vw, 100vh) * 0.02), 20px)',
             fontWeight: 600,
             whiteSpace: 'nowrap',
             color: active ? '#f050f8' : '#552058',

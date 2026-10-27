@@ -7,3 +7,12 @@ export const fetchValues = async (): Promise<ValuesResponse> => {
   }
   return res.json();
 };
+
+// Returns the HTTP status so the caller can explain refusals. Throws only if the server can't be reached.
+export const authoriseCharging = async (key: string): Promise<number> => {
+  const res = await fetch('/api/charging/authorise', {
+    method: 'POST',
+    headers: { 'X-Charge-Key': key },
+  });
+  return res.status;
+};

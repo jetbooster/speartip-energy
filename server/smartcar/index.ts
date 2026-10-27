@@ -41,13 +41,24 @@ let latestStateOfCharge: StateOfCharge | null = loadStateOfCharge();
 
 export const getStateOfCharge = (): StateOfCharge | null => latestStateOfCharge;
 
+const validateSmartCarWebhook = (meta: { webhookId: string }): boolean => {
+  if (process.env.SMARTCAR_WEBHOOK_ID && meta.webhookId !== process.env.SMARTCAR_WEBHOOK_ID) {
+    console.warn(`Ignoring SmartCar webhook with unexpected webhookId ${meta.webhookId}`);
+    return false;
+  }
+  return true;
+}
+
 export const webhookHandler = async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
-  const { eventType, data } = await req.json() as SmartCarWebhook;
+  const { eventType, data, meta } = await req.json() as SmartCarWebhook;
   switch (eventType) {
     case 'VEHICLE_STATE': {
+      if (!validateSmartCarWebhook(meta)){
+        return new Response('Invalid webhook', { status: 400 });
+      } 
       const signal = data.signals.find(s => s.code === 'tractionbattery-stateofcharge');
       if (signal) {
         latestStateOfCharge = { percent: signal.body.value, updatedAt: new Date().toISOString() };

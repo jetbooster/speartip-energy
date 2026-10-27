@@ -1,5 +1,6 @@
 import { Alert, CircularProgress, Snackbar } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { captureChargeKeyFromHash } from './chargeKey';
 import { fetchValues } from './fetch';
 import DisplayGrid from './Grid';
 import type { ValuesResponse } from './types/types';
@@ -25,22 +26,28 @@ export default function App() {
   };
 
   // Polling is independent of `active`. Failed polls retry on the next tick.
-  useEffect(() => {
-    const loadValues = () => fetchValues()
-      .then((data) => {
-        setValues(data);
-        setConnectionError(false);
-      })
-      .catch(() => setConnectionError(true));
+  const loadValues = useCallback(() => fetchValues()
+    .then((data) => {
+      setValues(data);
+      setConnectionError(false);
+    })
+    .catch(() => setConnectionError(true)), []);
 
+  useEffect(() => {
+    captureChargeKeyFromHash();
+  }, []);
+
+  useEffect(() => {
     loadValues();
     const interval = setInterval(loadValues, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadValues]);
 
   return (
     <>
-      {values ? <DisplayGrid onClick={onClick} values={values} active={active} /> : <CircularProgress />}
+      {values
+        ? <DisplayGrid onClick={onClick} values={values} active={active} onChargeStarted={loadValues} />
+        : <CircularProgress />}
       <Snackbar
         open={connectionError}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

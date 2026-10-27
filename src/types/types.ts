@@ -31,6 +31,9 @@ export interface SmartCarWebhookBase {
   eventId: string;
   eventType: string;
   data: Record<string, unknown>;
+  meta: {
+    webhookId: string;
+  }
 }
 
 export interface SmartCarBatteryWebhook extends SmartCarWebhookBase {
@@ -45,12 +48,12 @@ export interface SmartCarBatteryWebhook extends SmartCarWebhookBase {
       make: string;
       model: string;
     }
-    signals:[
+    signals: [
       {
         code: "tractionbattery-stateofcharge";
         name: "StateOfCharge";
         group: "TractionBattery";
-        body:{
+        body: {
           value: number;
           unit: "percent";
         }

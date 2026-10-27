@@ -2,6 +2,7 @@ import path from 'path';
 import 'crypto';
 import type { ValuesResponse } from '../src/types/types';
 import { getChargingStatus } from './easee';
+import { authoriseChargingHandler } from './easee/authorise';
 import { getValues, getVariables } from './foxcloud';
 import { getRateNow } from './octopus';
 import { getStateOfCharge, webhookHandler } from './smartcar';
@@ -49,6 +50,9 @@ Bun.serve({
       }
       case '/api/variables': {
         return Response.json(await getVariables());
+      }
+      case '/api/charging/authorise': {
+        return authoriseChargingHandler(req);
       }
       case '/auth/smartcar/redirect': {
         return new Response('SmartCar redirect endpoint. This is not a real page, but you can use this URL to complete the OAuth flow.');
