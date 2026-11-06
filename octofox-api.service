@@ -1,9 +1,11 @@
 [Unit]
 Description=Octofox API
+Wants=network-online.target
 After=network-online.target
 
 [Service]
 Restart=on-failure
+RestartSec=5
 WorkingDirectory=/home/ubuntu/workspace/speartip-energy/server
 Type=simple
 User=ubuntu

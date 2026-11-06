@@ -38,6 +38,7 @@ console.log('Speartip Api backend started');
 keepTokensFresh();
 
 Bun.serve({
+  hostname: '127.0.0.1',
   port: 29999,
   async fetch(req) {
     const url = new URL(req.url);
