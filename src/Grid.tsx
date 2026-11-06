@@ -6,8 +6,6 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Grid from '@mui/material/Grid2';
@@ -64,8 +62,6 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
   // A car left waiting here never charges, because the charger blocks it whatever IOG asks for.
   const carNeedsAuthorising = values.charger?.carAwaitingAuthorization ?? false;
   const carBlink = useBlink(carNeedsAuthorising);
-
-  const price = Number(values.price.toPrecision(2));
 
   // Only a car that is actually waiting can be authorised. The server checks this again.
   const onCarTap = () => {
@@ -175,7 +171,6 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
               colour="#666"
               units={{ normal: 'kW', milli: 'W' }}
               startAngle={-90}
-              subLabel={`${price}p`}
             />
           </Item>
         </Grid>
@@ -187,9 +182,6 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
 
       <Dialog open={confirming} onClose={() => setConfirming(false)}>
         <DialogTitle>Start charging?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{`Electricity is currently ${price}p/kWh.`}</DialogContentText>
-        </DialogContent>
         <DialogActions>
           <Button size="large" onClick={() => setConfirming(false)}>Cancel</Button>
           <Button size="large" variant="contained" onClick={startCharging} disabled={sending}>

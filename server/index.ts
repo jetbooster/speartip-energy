@@ -5,14 +5,12 @@ import { getChargingStatus } from './easee';
 import { keepTokensFresh } from './easee/auth';
 import { authoriseChargingHandler } from './easee/authorise';
 import { getValues, getVariables } from './foxcloud';
-import { getRateNow } from './octopus';
 import { getStateOfCharge, webhookHandler } from './smartcar';
 
 const distDir = path.join(import.meta.dir, '..', 'dist');
 
 const getDashboardValues = async (): Promise<ValuesResponse> => {
-  const [price, values, charger] = await Promise.all([
-    getRateNow(),
+  const [values, charger] = await Promise.all([
     getValues(),
     getChargingStatus().catch((err: unknown) => {
       console.error('Failed to fetch Easee charging status', err);
@@ -26,7 +24,6 @@ const getDashboardValues = async (): Promise<ValuesResponse> => {
     grid: values.meterPower.value,
     batteryCharge: values.SoC.value,
     batteryPower: values.batChargePower.value - values.batDischargePower.value,
-    price,
     carChargeLevel: stateOfCharge?.percent ?? null,
     carChargeLevelUpdatedAt: stateOfCharge?.updatedAt ?? null,
     charger,

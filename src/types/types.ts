@@ -19,7 +19,6 @@ export interface ValuesResponse {
   grid: number;
   batteryCharge: number;
   batteryPower: number;
-  price: number;
   // Car state of charge from Smartcar, null until the first webhook ever received. Persisted across restarts.
   carChargeLevel: number | null;
   carChargeLevelUpdatedAt: string | null;
