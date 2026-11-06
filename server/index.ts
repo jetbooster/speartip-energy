@@ -2,6 +2,7 @@ import path from 'path';
 import 'crypto';
 import type { ValuesResponse } from '../src/types/types';
 import { getChargingStatus } from './easee';
+import { keepTokensFresh } from './easee/auth';
 import { authoriseChargingHandler } from './easee/authorise';
 import { getValues, getVariables } from './foxcloud';
 import { getRateNow } from './octopus';
@@ -33,6 +34,8 @@ const getDashboardValues = async (): Promise<ValuesResponse> => {
 };
 
 console.log('Speartip Api backend started');
+
+keepTokensFresh();
 
 Bun.serve({
   port: 29999,

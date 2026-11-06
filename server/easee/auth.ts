@@ -8,6 +8,9 @@ const API_ROOT = 'https://api.easee.com';
 // Refresh this long before the access token expires so a request never races the expiry.
 const REFRESH_MARGIN_MS = 5 * 60 * 1000;
 
+// How long keepTokensFresh waits before trying again after a failed refresh.
+const RETRY_DELAY_MS = 5 * 60 * 1000;
+
 // Lives outside the repo and survives reboots. Override with EASEE_TOKEN_FILE.
 export const TOKEN_FILE = process.env.EASEE_TOKEN_FILE
   ?? path.join(homedir(), '.config', 'speartip-energy', 'easee-tokens.json');
@@ -90,4 +93,25 @@ export const getAccessToken = (force = false): Promise<string> => {
     inFlight = null;
   });
   return inFlight;
+};
+
+// Easee also expires the refresh token if it goes unused for long enough (somewhere between 8 and 33 hours),
+// so refresh on a timer instead of waiting for the dashboard to ask for charger data.
+export const keepTokensFresh = () => {
+  const refresh = async () => {
+    let delay = RETRY_DELAY_MS;
+    try {
+      await getAccessToken();
+      const stored = await readTokens();
+      if (stored) {
+        delay = stored.accessTokenExpiresAt - REFRESH_MARGIN_MS - Date.now();
+      }
+    }
+    catch (err) {
+      console.error('Failed to refresh Easee tokens', err);
+    }
+    // A timer that fires slightly early just finds the token still fresh and reschedules.
+    setTimeout(refresh, Math.max(delay, 1000));
+  };
+  void refresh();
 };
