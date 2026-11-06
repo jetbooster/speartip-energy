@@ -19,6 +19,7 @@ import type { ValuesResponse } from './types/types';
 import WashingMachineTimer from './components/WashingMachineTimer';
 import Item from './components/Item';
 import { authoriseCharging } from './fetch';
+import useBlink from './hooks/useBlink';
 
 interface DisplayGridProps {
   onClick: () => void;
@@ -60,11 +61,15 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<{ severity: 'success' | 'error'; message: string } | null>(null);
 
+  // A car left waiting here never charges, because the charger blocks it whatever IOG asks for.
+  const carNeedsAuthorising = values.charger?.carAwaitingAuthorization ?? false;
+  const carBlink = useBlink(carNeedsAuthorising);
+
   const price = Number(values.price.toPrecision(2));
 
   // Only a car that is actually waiting can be authorised. The server checks this again.
   const onCarTap = () => {
-    if (values.charger?.carAwaitingAuthorization) {
+    if (carNeedsAuthorising) {
       setConfirming(true);
     }
   };
@@ -151,8 +156,8 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
               icon={<ElectricCar />}
               colour="#036"
               units={{ normal: '%', noSpace: true }}
-              text={values.carChargeLevel === null ? '—' : undefined}
-              active={active}
+              text={carBlink ? '' : (values.carChargeLevel === null ? '—' : undefined)}
+              active={active || (carNeedsAuthorising && !carBlink)}
               // Charger power only shows as a flow while a car is plugged in.
               diff={values.charger?.carConnected ? (values.charger.totalPower ?? 0) : undefined}
               subLabel={carSubLabel(values)}
