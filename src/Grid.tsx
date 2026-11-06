@@ -181,11 +181,11 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
       </Grid>
 
       <Dialog open={confirming} onClose={() => setConfirming(false)}>
-        <DialogTitle>Start charging?</DialogTitle>
+        <DialogTitle>Approve charging?</DialogTitle>
         <DialogActions>
           <Button size="large" onClick={() => setConfirming(false)}>Cancel</Button>
           <Button size="large" variant="contained" onClick={startCharging} disabled={sending}>
-            Start charging
+            Approve charging
           </Button>
         </DialogActions>
       </Dialog>
