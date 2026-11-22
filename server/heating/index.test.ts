@@ -46,9 +46,12 @@ const mockHouse = () => {
     const url = new URL(input.toString());
     const body = parse(init?.body);
     const unit = house[body.entity_id as string];
+    // Like MELCloud Home, set_temperature ignores any hvac_mode sent with it.
     if (url.pathname === '/api/services/climate/set_temperature') {
-      unit.state = body.hvac_mode as string;
       unit.temperature = body.temperature as number;
+    }
+    else if (url.pathname === '/api/services/climate/set_hvac_mode') {
+      unit.state = body.hvac_mode as string;
     }
     else if (url.pathname === '/api/services/climate/turn_off') {
       unit.state = 'off';

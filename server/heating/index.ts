@@ -159,11 +159,9 @@ export const runHeatingCheck = async (now = new Date()) => {
       }
       // Only take over a unit that's off. One already running was set up by someone on purpose.
       if (state === 'off') {
-        await callService('climate', 'set_temperature', {
-          entity_id: entityId,
-          hvac_mode: 'heat',
-          temperature: TARGET_TEMPERATURE,
-        });
+        // Two calls: MELCloud Home ignores an hvac_mode sent along with set_temperature.
+        await callService('climate', 'set_hvac_mode', { entity_id: entityId, hvac_mode: 'heat' });
+        await callService('climate', 'set_temperature', { entity_id: entityId, temperature: TARGET_TEMPERATURE });
         owned.add(entityId);
         console.log(`Heating: heating with ${entityId} to ${TARGET_TEMPERATURE}°C`
           + ` (${cheapRate ? 'overnight rate' : `battery ${batteryPercent}%`})`);
