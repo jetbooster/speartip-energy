@@ -5,6 +5,7 @@ import { getChargingStatus } from './easee';
 import { keepTokensFresh } from './easee/auth';
 import { authoriseChargingHandler } from './easee/authorise';
 import { getValues, getVariables } from './foxcloud';
+import { startHeatingSchedule } from './heating';
 import { getStateOfCharge, webhookHandler } from './smartcar';
 
 const distDir = path.join(import.meta.dir, '..', 'dist');
@@ -33,6 +34,7 @@ const getDashboardValues = async (): Promise<ValuesResponse> => {
 console.log('Speartip Api backend started');
 
 keepTokensFresh();
+startHeatingSchedule();
 
 Bun.serve({
   hostname: '127.0.0.1',
