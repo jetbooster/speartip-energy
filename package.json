@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "test": "bun run test:server && bun run test:frontend",
     "test:server": "bun test server",
-    "test:frontend": "bun --bun vitest run"
+    "test:frontend": "bun --bun vitest run",
+    "test:visual": "bunx playwright test",
+    "test:visual:update": "bunx playwright test --update-snapshots"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.65.0",
     "@stylistic/eslint-plugin": "^2.12.1",
     "@types/bun": "^1.1.16",
     "@types/node": "^22.10.5",
