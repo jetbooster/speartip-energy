@@ -26,32 +26,12 @@ interface DisplayGridProps {
   onChargeStarted: () => void;
 }
 
-const STALE_AFTER_MS = 6 * 60 * 60 * 1000;
-
 // Explanations for the refusals the server can give. Anything else gets a generic message.
 const CHARGE_ERRORS: Record<number, string> = {
   403: 'This display\'s charging key was rejected',
   404: 'Charging authorisation is not enabled on the server',
   409: 'The car is no longer waiting for authorisation',
   429: 'A request was just sent. Wait a moment and try again',
-};
-
-// Status shown under the car dial. Plugged-in state takes priority over the age of the reading.
-const carSubLabel = (values: ValuesResponse): string | undefined => {
-  if (!values.charger) {
-    return 'No charger data';
-  }
-  if (!values.charger.carConnected) {
-    return 'Unplugged';
-  }
-  if (values.charger.carAwaitingAuthorization) {
-    return 'Awaiting authorisation';
-  }
-  if (values.carChargeLevelUpdatedAt && Date.now() - Date.parse(values.carChargeLevelUpdatedAt) > STALE_AFTER_MS) {
-    const hours = Math.floor((Date.now() - Date.parse(values.carChargeLevelUpdatedAt)) / (60 * 60 * 1000));
-    return `Updated ${hours}h ago`;
-  }
-  return undefined;
 };
 
 export default function DisplayGrid({ onClick, values, active, onChargeStarted }: DisplayGridProps) {
@@ -152,11 +132,12 @@ export default function DisplayGrid({ onClick, values, active, onChargeStarted }
               icon={<ElectricCar />}
               colour="#036"
               units={{ normal: '%', noSpace: true }}
-              text={carBlink ? '' : (values.carChargeLevel === null ? '—' : undefined)}
+              // While waiting, the centre alternates between the charge level and a prompt to tap.
+              text={carBlink ? 'Approve' : (values.carChargeLevel === null ? '—' : undefined)}
+              textScale={carBlink ? 0.7 : 1}
               active={active || (carNeedsAuthorising && !carBlink)}
               // Charger power only shows as a flow while a car is plugged in.
               diff={values.charger?.carConnected ? (values.charger.totalPower ?? 0) : undefined}
-              subLabel={carSubLabel(values)}
             />
           </Item>
         </Grid>

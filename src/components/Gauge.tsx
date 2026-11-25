@@ -23,8 +23,8 @@ interface GaugeProps {
   diff?: number;
   // Replaces the formatted value in the centre, e.g. a placeholder when there is no reading.
   text?: string;
-  // Small line of text under the dial, e.g. a rate or status.
-  subLabel?: ReactNode;
+  // Multiplies the centre text size. Words look heavier than readings like "2.4 kW", so prompts use less than 1.
+  textScale?: number;
 }
 
 const TWEEN_MS = 1000;
@@ -50,7 +50,7 @@ export default function MyGauge({
   exponential = false,
   diff,
   text,
-  subLabel,
+  textScale = 1,
 }: GaugeProps) {
   // x-charts doesn't animate the arc, so we tween the displayed value towards `val`.
   const [shown, setShown] = useState(val);
@@ -107,7 +107,7 @@ export default function MyGauge({
             },
           },
           [`& .${gaugeClasses.valueText}`]: {
-            fontSize: height > width ? '8vw' : '11.5vh',
+            fontSize: `calc(${height > width ? '8vw' : '11.5vh'} * ${textScale})`,
             fontWeight: 500,
             transform: `translate(0px, ${height > width ? '9vw' : '9vh'})`,
           },
@@ -139,23 +139,6 @@ export default function MyGauge({
           top="48%"
           active={active}
         />
-      )}
-      {subLabel !== undefined && (
-        <Box
-          sx={{
-            position: 'absolute',
-            left: '31%',
-            top: '45%',
-            transform: 'translate(-50%, -50%)',
-            // Same size as the FlowArrow label, so the two read as a pair.
-            fontSize: 'clamp(16px, calc(min(100vw, 100vh) * 0.02), 20px)',
-            fontWeight: 600,
-            whiteSpace: 'nowrap',
-            color: active ? '#f050f8' : '#552058',
-          }}
-        >
-          {subLabel}
-        </Box>
       )}
     </Box>
   );
