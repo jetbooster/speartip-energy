@@ -108,3 +108,19 @@ test('scrolls back to the top once the display goes idle', async ({ page }) => {
   await expect(page.getByTestId('SolarPowerIcon')).toBeInViewport();
   await expect(page.getByTestId('LocalFireDepartmentIcon')).not.toBeInViewport();
 });
+
+// A real touch swipe, starting on a dial. The mouse wheel ignores touch-action, so it can't catch a dial
+// that swallows swipes, which is what x-charts' gauges do unless gaugeFrame overrides it.
+test('swiping up on a dial scrolls to the lower row', async ({ page }) => {
+  await showDashboard(page, values());
+  const dial = (await page.getByTestId('SolarPowerIcon').boundingBox())!;
+  const x = Math.round(dial.x + dial.width / 2);
+  const from = Math.round(dial.y + dial.height / 2) + 100;
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: from }] });
+  for (let step = 1; step <= 10; step++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: from - step * 25 }] });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await expect(page.getByTestId('LocalFireDepartmentIcon')).toBeInViewport();
+});

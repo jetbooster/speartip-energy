@@ -10,7 +10,7 @@ export const GAUGE_CORNER_RADIUS = 80;
 export const gaugeHeight = (height: number, width: number) => (height <= width ? height / 2 : height / 3);
 
 export const gaugeFrameSx = (active: boolean, height: number, width: number, textScale = 1) => ({
-  filter: active ? 'brightness(230%)' : '',
+  'filter': active ? 'brightness(230%)' : '',
   [`& .${gaugeClasses.valueText}`]: {
     fontSize: `calc(${height > width ? '8vw' : '11.5vh'} * ${textScale})`,
     fontWeight: 500,
@@ -30,5 +30,11 @@ export const gaugeFrameSx = (active: boolean, height: number, width: number, tex
   },
   [`& .${gaugeClasses.root}`]: {
     height: '200px',
+  },
+  // x-charts sets touch-action: none on its SVG so charts can be dragged. The dials fill the screen, so that
+  // would swallow every swipe and the page couldn't scroll to the lower row. Vertical swipes scroll instead.
+  // The chart's SVG has no stable class to target, so this covers every SVG in the dial.
+  '& svg': {
+    touchAction: 'pan-y',
   },
 });
