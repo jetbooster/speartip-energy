@@ -14,3 +14,10 @@ export interface DeviceQueryBody {
     value: number;
   }[];
 }
+
+// One entry per variable. With dimension 'day', `values` has one total per hour, starting at midnight.
+export type ReportQueryResponse = FoxCloudResponse<{
+  variable: string;
+  unit: string;
+  values: number[];
+}[]>;

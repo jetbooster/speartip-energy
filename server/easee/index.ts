@@ -2,7 +2,8 @@ import type { ChargerStatus } from '../../src/types/types';
 import { getAccessToken } from './auth';
 import type { ChargerState, OpMode, SiteDashboardState, SiteDTO } from './types';
 
-const API_ROOT = 'https://api.easee.com';
+// Overridable so `bun run dev:mock` can point it at fake upstreams.
+const API_ROOT = process.env.EASEE_API_ROOT ?? 'https://api.easee.com';
 
 const { EASEE_CHARGER_ID } = process.env;
 

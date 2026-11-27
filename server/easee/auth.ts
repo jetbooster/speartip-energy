@@ -3,7 +3,8 @@ import { homedir } from 'node:os';
 import path from 'node:path';
 import type { UserToken } from './types';
 
-const API_ROOT = 'https://api.easee.com';
+// Overridable so `bun run dev:mock` can point it at fake upstreams.
+const API_ROOT = process.env.EASEE_API_ROOT ?? 'https://api.easee.com';
 
 // Refresh this long before the access token expires so a request never races the expiry.
 const REFRESH_MARGIN_MS = 5 * 60 * 1000;

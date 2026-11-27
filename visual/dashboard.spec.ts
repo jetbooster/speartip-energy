@@ -24,6 +24,9 @@ const values = (overrides: Partial<ValuesResponse> = {}): ValuesResponse => ({
   carChargeLevel: 52,
   carChargeLevelUpdatedAt: NOW.toISOString(),
   charger: charger(),
+  energySources: { cheapGrid: 9.15, solar: 0.5, expensiveGrid: 0.95 },
+  weather: { temperature: 5.3, cloudCover: 100, condition: 'cloudy' },
+  heating: { indoorTemperature: 17.8, gasHeating: true, acUnitsHeating: 0 },
   ...overrides,
 });
 
@@ -73,4 +76,35 @@ test('car waiting for charging to be authorised', async ({ page }) => {
 test('no reading from the charger', async ({ page }) => {
   await showDashboard(page, values({ charger: null, carChargeLevel: null }));
   await expect(page).toHaveScreenshot('no-charger-data.png');
+});
+
+test('scrolled down to the weather and heating row', async ({ page }) => {
+  await showDashboard(page, values());
+  await page.mouse.move(400, 200);
+  await page.mouse.wheel(0, 2000);
+  await expect(page.getByTestId('LocalFireDepartmentIcon')).toBeInViewport();
+  await expect(page).toHaveScreenshot('lower-row.png');
+});
+
+test('heating with the ACs on a sunny day', async ({ page }) => {
+  await showDashboard(page, values({
+    weather: { temperature: 11.6, cloudCover: 20, condition: 'sunny' },
+    heating: { indoorTemperature: 19.2, gasHeating: false, acUnitsHeating: 3 },
+    energySources: { cheapGrid: 3.2, solar: 6.8, expensiveGrid: 1.4 },
+  }));
+  await page.mouse.move(400, 200);
+  await page.mouse.wheel(0, 2000);
+  await expect(page.getByTestId('HeatPumpIcon')).toBeInViewport();
+  await expect(page).toHaveScreenshot('lower-row-ac-heating.png');
+});
+
+test('scrolls back to the top once the display goes idle', async ({ page }) => {
+  await showDashboard(page, values());
+  await page.mouse.move(400, 200);
+  await page.mouse.wheel(0, 2000);
+  await expect(page.getByTestId('LocalFireDepartmentIcon')).toBeInViewport();
+  // The display stays active for 3 minutes after the last swipe or tap.
+  await page.clock.runFor(3 * 60 * 1000 + 1000);
+  await expect(page.getByTestId('SolarPowerIcon')).toBeInViewport();
+  await expect(page.getByTestId('LocalFireDepartmentIcon')).not.toBeInViewport();
 });

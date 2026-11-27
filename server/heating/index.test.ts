@@ -81,21 +81,6 @@ afterEach(() => {
   mock.restore();
 });
 
-describe('isCheapRate', () => {
-  test.each([
-    ['2027-01-15T23:29:59Z', false],
-    ['2027-01-15T23:30:00Z', true],
-    ['2027-01-16T03:00:00Z', true],
-    ['2027-01-16T05:29:59Z', true],
-    ['2027-01-16T05:30:00Z', false],
-    // British Summer Time: 22:30 UTC is 23:30 in the UK.
-    ['2027-07-15T22:30:00Z', true],
-    ['2027-07-16T04:30:00Z', false],
-  ])('%s -> %p', (iso, expected) => {
-    expect(heating.isCheapRate(new Date(iso))).toBe(expected);
-  });
-});
-
 describe('runHeatingCheck', () => {
   test('overnight, heats every unit except the main bedroom to 19°C', async () => {
     await heating.runHeatingCheck(NIGHT);

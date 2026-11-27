@@ -3,6 +3,7 @@ import { homedir } from 'node:os';
 import path from 'node:path';
 import { getValues } from '../foxcloud';
 import { callService, getState, isConfigured } from '../homeassistant';
+import { isCheapRate } from '../tariff';
 
 // Heat with the AC units (air-to-air heat pumps) when electricity is cheap: either the overnight rate or a
 // battery full of solar. At a winter COP of ~2 that beats gas, but at the peak rate it doesn't, so the job
@@ -29,26 +30,9 @@ export const AC_UNITS: AcUnit[] = [
   { entityId: 'climate.guest_bedroom' },
 ];
 
-// Overnight rate, 23:30-05:30 UK time.
-const CHEAP_START_MINUTES = 23 * 60 + 30;
-const CHEAP_END_MINUTES = 5 * 60 + 30;
-
 const CHECK_INTERVAL_MS = 30 * 60 * 1000;
 // Run a few seconds after each :00/:30 so a timer that fires early still lands inside the new half hour.
 const CHECK_OFFSET_MS = 5000;
-
-const londonClock = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Europe/London',
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-});
-
-export const isCheapRate = (now: Date) => {
-  const [hours, minutes] = londonClock.format(now).split(':').map(Number);
-  const m = hours * 60 + minutes;
-  return m >= CHEAP_START_MINUTES || m < CHEAP_END_MINUTES;
-};
 
 export const shouldHeatFromBattery = ({ batteryPercent, solarKw }: Readings, alreadyHeating: boolean) =>
   alreadyHeating

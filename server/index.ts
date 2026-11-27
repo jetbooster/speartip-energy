@@ -4,17 +4,24 @@ import type { ValuesResponse } from '../src/types/types';
 import { getChargingStatus } from './easee';
 import { keepTokensFresh } from './easee/auth';
 import { authoriseChargingHandler } from './easee/authorise';
-import { getValues, getVariables } from './foxcloud';
+import { energySources } from './energy';
+import { getCachedTodayHourly, getCachedValues, getVariables } from './foxcloud';
 import { startHeatingSchedule } from './heating';
+import { getHomeStatus } from './home';
 import { getStateOfCharge, webhookHandler } from './smartcar';
 
 const distDir = path.join(import.meta.dir, '..', 'dist');
 
 const getDashboardValues = async (): Promise<ValuesResponse> => {
-  const [values, charger] = await Promise.all([
-    getValues(),
+  const [values, charger, home, todayHourly] = await Promise.all([
+    getCachedValues(),
     getChargingStatus().catch((err: unknown) => {
       console.error('Failed to fetch Easee charging status', err);
+      return null;
+    }),
+    getHomeStatus(),
+    getCachedTodayHourly().catch((err: unknown) => {
+      console.error('Failed to fetch FoxCloud hourly report', err);
       return null;
     }),
   ]);
@@ -28,6 +35,9 @@ const getDashboardValues = async (): Promise<ValuesResponse> => {
     carChargeLevel: stateOfCharge?.percent ?? null,
     carChargeLevelUpdatedAt: stateOfCharge?.updatedAt ?? null,
     charger,
+    energySources: todayHourly && energySources(todayHourly),
+    weather: home.weather,
+    heating: home.heating,
   };
 };
 

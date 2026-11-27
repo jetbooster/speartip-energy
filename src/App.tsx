@@ -18,11 +18,16 @@ export default function App() {
   const activeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Activity is a user event, so the timeout is scheduled here rather than in an effect.
-  const onClick = () => {
+  const markActive = () => {
     setActive(true);
     clearTimeout(activeTimer.current);
     activeTimer.current = setTimeout(() => setActive(false), ACTIVE_TIMEOUT_MS);
-    document.body.requestFullscreen();
+  };
+
+  // Only a tap can go fullscreen: browsers refuse it from a swipe.
+  const onClick = () => {
+    markActive();
+    document.body.requestFullscreen().catch(() => undefined);
   };
 
   // Polling is independent of `active`. Failed polls retry on the next tick.
@@ -46,7 +51,15 @@ export default function App() {
   return (
     <>
       {values
-        ? <DisplayGrid onClick={onClick} values={values} active={active} onChargeStarted={loadValues} />
+        ? (
+            <DisplayGrid
+              onClick={onClick}
+              onActivity={markActive}
+              values={values}
+              active={active}
+              onChargeStarted={loadValues}
+            />
+          )
         : <CircularProgress />}
       <Snackbar
         open={connectionError}

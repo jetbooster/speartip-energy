@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
-import type { SmartCarWebhook } from "../../src/types/types";
+import type { SmartCarWebhook } from '../../src/types/types';
 
 interface StateOfCharge {
   percent: number;
@@ -47,7 +47,7 @@ const validateSmartCarWebhook = (meta: { webhookId: string }): boolean => {
     return false;
   }
   return true;
-}
+};
 
 export const webhookHandler = async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
@@ -56,9 +56,9 @@ export const webhookHandler = async (req: Request): Promise<Response> => {
   const { eventType, data, meta } = await req.json() as SmartCarWebhook;
   switch (eventType) {
     case 'VEHICLE_STATE': {
-      if (!validateSmartCarWebhook(meta)){
+      if (!validateSmartCarWebhook(meta)) {
         return new Response('Invalid webhook', { status: 400 });
-      } 
+      }
       const signal = data.signals.find(s => s.code === 'tractionbattery-stateofcharge');
       if (signal) {
         latestStateOfCharge = { percent: signal.body.value, updatedAt: new Date().toISOString() };
@@ -73,13 +73,10 @@ export const webhookHandler = async (req: Request): Promise<Response> => {
       hasher.update(data.challenge);
       const hash = hasher.digest('hex');
       return Response.json({ challenge: hash }, { status: 200 });
-
     }
     default: {
       console.warn(`Unknown SmartCar webhook event type: ${eventType}`);
       return new Response('Unknown event type', { status: 400 });
     }
-
   }
-
-}
+};

@@ -18,10 +18,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // The backend to talk to. scripts/dev.ts sets this for the remote and mock modes.
       '/api': {
-        target: 'http://127.0.0.1:29999',
+        target: process.env.API_TARGET ?? 'http://127.0.0.1:29999',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api\/v1/, ""),
       },
     },
     port: 9000,

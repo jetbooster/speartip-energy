@@ -6,6 +6,8 @@
   "scripts": {
     "build": "vite build --emptyOutDir",
     "dev": "bunx --bun vite",
+    "dev:remote": "bun server/dev/index.ts remote",
+    "dev:mock": "bun server/dev/index.ts mock",
     "tsc": "tsc -b",
     "lint": "eslint .",
     "test": "bun run test:server && bun run test:frontend",

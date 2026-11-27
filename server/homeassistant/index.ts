@@ -31,6 +31,9 @@ const request = async (method: 'GET' | 'POST', path: string, body?: object) => {
 export const getState = async (entityId: string): Promise<HassEntity> =>
   (await request('GET', `/api/states/${entityId}`)).json() as Promise<HassEntity>;
 
+export const getAllStates = async (): Promise<HassEntity[]> =>
+  (await request('GET', '/api/states')).json() as Promise<HassEntity[]>;
+
 export const callService = async (domain: string, service: string, data: Record<string, unknown>) => {
   await request('POST', `/api/services/${domain}/${service}`, data);
 };

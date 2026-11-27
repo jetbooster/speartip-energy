@@ -3,6 +3,7 @@ import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import FlowArrow from './FlowArrow';
+import { GAUGE_CORNER_RADIUS, GAUGE_END_ANGLE, gaugeFrameSx, gaugeHeight } from './gaugeFrame';
 
 interface GaugeProps {
   val: number;
@@ -95,36 +96,14 @@ export default function MyGauge({
       <Gauge
         value={exponential ? (Math.pow(shown / max, 0.3) * 100) : ((shown / max) * 100)}
         startAngle={startAngle}
-        endAngle={120}
-        cornerRadius={80}
-        height={height <= width ? (height / 2) : (height / 3)}
+        endAngle={GAUGE_END_ANGLE}
+        cornerRadius={GAUGE_CORNER_RADIUS}
+        height={gaugeHeight(height, width)}
         sx={theme => ({
-          filter: `${active ? 'brightness(230%)' : ''}`,
+          ...gaugeFrameSx(active, height, width, textScale),
           color: colour,
           [`& .${gaugeClasses.valueArc}`]: {
-            'fill': colour ?? theme.palette.primary.main,
-            '& path': {
-            },
-          },
-          [`& .${gaugeClasses.valueText}`]: {
-            fontSize: `calc(${height > width ? '8vw' : '11.5vh'} * ${textScale})`,
-            fontWeight: 500,
-            transform: `translate(0px, ${height > width ? '9vw' : '9vh'})`,
-          },
-          [`& .${gaugeClasses.valueText} text`]: {
-            fill: active ? '#bbb' : '#888',
-          },
-          [`& .${gaugeClasses.referenceArc}`]: {
-            fill: '#0b0b0b',
-          },
-          ['& .MuiSvgIcon-root']: {
-            '& path': {
-              transform: `translate(0px, ${height > width ? '0px' : '-0.1vh'}) scale(0.45)`,
-              transformOrigin: 'center center',
-            },
-          },
-          [`& .${gaugeClasses.root}`]: {
-            height: '200px',
+            fill: colour ?? theme.palette.primary.main,
           },
         })}
         text={() => text ?? transformWithUnits()}
