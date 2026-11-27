@@ -100,13 +100,23 @@ const foxcloudValues = () => {
   return { errno: 0, result: [{ deviceSN: 'MOCK', datas }] };
 };
 
-// FoxCloud's hourly report for today, built from the three totals above.
-const foxcloudReport = () => {
+// Past days get made-up but steady totals that vary by date, so the history chart has something to show.
+const pastDay = (day: number) => ({
+  todayCheapImport: 6 + (day * 7) % 9,
+  todaySolar: (day * 5) % 11,
+  todayPeakImport: (day * 3) % 4,
+});
+
+// FoxCloud's hourly report for one day. Today comes from the three totals above.
+const foxcloudReport = ({ year, month, day }: { year: number; month: number; day: number }) => {
+  const now = new Date();
+  const isToday = year === now.getFullYear() && month === now.getMonth() + 1 && day === now.getDate();
+  const totals = isToday ? state : pastDay(day);
   const hours = (at: Record<number, number>) => Array.from({ length: 24 }, (_, hour) => at[hour] ?? 0);
   const series = {
-    PVEnergyTotal: hours({ 12: state.todaySolar }),
+    PVEnergyTotal: hours({ 12: totals.todaySolar }),
     feedin: hours({}),
-    gridConsumption: hours({ 2: state.todayCheapImport, 18: state.todayPeakImport }),
+    gridConsumption: hours({ 2: totals.todayCheapImport, 18: totals.todayPeakImport }),
     chargeEnergyToTal: hours({}),
     dischargeEnergyToTal: hours({}),
   };
@@ -178,7 +188,7 @@ const handle = async (req: Request): Promise<Response> => {
     return Response.json(foxcloudValues());
   }
   if (route === 'POST /op/v0/device/report/query') {
-    return Response.json(foxcloudReport());
+    return Response.json(foxcloudReport(await req.json() as { year: number; month: number; day: number }));
   }
   if (route === 'GET /op/v0/device/variable/get') {
     return Response.json({ errno: 0, result: [] });

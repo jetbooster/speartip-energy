@@ -7,8 +7,21 @@ export const SOURCE_COLOURS: Record<keyof EnergySources, string> = {
   expensiveGrid: '#700',
 };
 
+// What those colours become on the brightened display, for places drawn at full strength, like the history chart.
+export const SOURCE_NEON: Record<keyof EnergySources, string> = {
+  cheapGrid: '#0edd0e',
+  solar: '#0076eb',
+  expensiveGrid: '#ff1a1a',
+};
+
+export const SOURCE_LABELS: Record<keyof EnergySources, string> = {
+  cheapGrid: 'Overnight',
+  solar: 'Solar',
+  expensiveGrid: 'Peak',
+};
+
 // Left to right along the arc.
-const ORDER: (keyof EnergySources)[] = ['cheapGrid', 'solar', 'expensiveGrid'];
+export const ORDER: (keyof EnergySources)[] = ['cheapGrid', 'solar', 'expensiveGrid'];
 
 // Space between segments, in radians, on top of what their rounded ends take up.
 const GAP = 0.06;

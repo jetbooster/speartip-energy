@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import type { ChargerStatus, ValuesResponse } from '../src/types/types';
+import type { ChargerStatus, EnergyDay, ValuesResponse } from '../src/types/types';
 
 // A fixed moment, so anything time-based renders the same on every run.
 const NOW = new Date('2026-11-25T01:00:00Z');
@@ -123,4 +123,45 @@ test('swiping up on a dial scrolls to the lower row', async ({ page }) => {
   }
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await expect(page.getByTestId('LocalFireDepartmentIcon')).toBeInViewport();
+});
+
+// A week ending on NOW's date, with one day FoxCloud didn't answer for.
+const WEEK: EnergyDay[] = [
+  ['2026-11-19', 8.2, 1.1, 0.6],
+  ['2026-11-20', 9.4, 0.4, 2.1],
+  ['2026-11-21', 7.1, 3.2, 0.3],
+  ['2026-11-22', 0, 0, 0],
+  ['2026-11-23', 11.8, 0.9, 4.2],
+  ['2026-11-24', 8.9, 2.6, 0.9],
+  ['2026-11-25', 6.3, 0.5, 0.2],
+].map(([date, cheapGrid, solar, expensiveGrid]) => ({
+  date: date as string,
+  sources: date === '2026-11-22'
+    ? null
+    : { cheapGrid: cheapGrid as number, solar: solar as number, expensiveGrid: expensiveGrid as number },
+}));
+
+const openHistory = async (page: Page) => {
+  await showDashboard(page, values());
+  await page.route('/api/energy/history', route => route.fulfill({ json: WEEK }));
+  await page.mouse.move(400, 200);
+  await page.mouse.wheel(0, 2000);
+  // The clock is frozen, so Playwright would wait forever for the dial to look still. force skips that wait.
+  await page.getByText('11 kWh').click({ force: true });
+  await expect(page.getByRole('dialog', { name: 'Where our electricity came from' })).toBeVisible();
+  await expect(page.getByText('Today').first()).toBeVisible();
+  // Let the dialog's fade and the bars' grow animation finish on the frozen clock.
+  await page.clock.runFor(2000);
+};
+
+test('tapping the energy dial shows the last week', async ({ page }) => {
+  await openHistory(page);
+  await expect(page).toHaveScreenshot('energy-history.png');
+});
+
+test('the close button closes the history', async ({ page }) => {
+  await openHistory(page);
+  await page.getByRole('button', { name: 'Close' }).click({ force: true });
+  await page.clock.runFor(1000);
+  await expect(page.getByRole('dialog', { name: 'Where our electricity came from' })).not.toBeVisible();
 });

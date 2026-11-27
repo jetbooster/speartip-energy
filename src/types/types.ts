@@ -41,6 +41,13 @@ export interface EnergySources {
   expensiveGrid: number;
 }
 
+// One day's usage by source, for the history chart. `date` is YYYY-MM-DD in UK time. `sources` is null when
+// FoxCloud didn't answer for that day.
+export interface EnergyDay {
+  date: string;
+  sources: EnergySources | null;
+}
+
 export interface ValuesResponse {
   solar: number;
   usage: number;

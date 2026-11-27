@@ -7,8 +7,11 @@ import {
   GaugeValueText,
   useGaugeState,
 } from '@mui/x-charts/Gauge';
+import { useEffect, useState } from 'react';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import type { EnergySources } from '../types/types';
+import DetailDialog from './DetailDialog';
+import EnergyHistoryChart, { HISTORY_DIALOG_WIDTH } from './EnergyHistoryChart';
 import { formatTotal, segmentAngles, SOURCE_COLOURS } from './energySegments';
 import { GAUGE_CORNER_RADIUS, GAUGE_END_ANGLE, gaugeFrameSx, gaugeHeight } from './gaugeFrame';
 import Item from './Item';
@@ -43,24 +46,44 @@ function Segments({ sources }: { sources: EnergySources }) {
 
 export default function EnergySourcesDial({ sources, active }: { sources: EnergySources | null; active: boolean }) {
   const { height, width } = useWindowDimensions();
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Closes with the rest of the display going idle, so a forgotten chart doesn't sit over the dashboard.
+  useEffect(() => {
+    if (!active) {
+      setShowHistory(false);
+    }
+  }, [active]);
+
   return (
-    <Item>
-      <Box sx={{ position: 'relative' }}>
-        <GaugeContainer
-          className={gaugeClasses.root}
-          value={null}
-          startAngle={-120}
-          endAngle={GAUGE_END_ANGLE}
-          cornerRadius={GAUGE_CORNER_RADIUS}
-          height={gaugeHeight(height, width)}
-          sx={gaugeFrameSx(active, height, width)}
-        >
-          <GaugeReferenceArc className={gaugeClasses.referenceArc} />
-          {sources && <Segments sources={sources} />}
-          <GaugeValueText className={gaugeClasses.valueText} text={sources ? formatTotal(sources) : '—'} />
-          <ElectricalServices />
-        </GaugeContainer>
-      </Box>
-    </Item>
+    <>
+      <Item onClick={() => setShowHistory(true)}>
+        <Box sx={{ position: 'relative' }}>
+          <GaugeContainer
+            className={gaugeClasses.root}
+            value={null}
+            startAngle={-120}
+            endAngle={GAUGE_END_ANGLE}
+            cornerRadius={GAUGE_CORNER_RADIUS}
+            height={gaugeHeight(height, width)}
+            sx={gaugeFrameSx(active, height, width)}
+          >
+            <GaugeReferenceArc className={gaugeClasses.referenceArc} />
+            {sources && <Segments sources={sources} />}
+            <GaugeValueText className={gaugeClasses.valueText} text={sources ? formatTotal(sources) : '—'} />
+            <ElectricalServices />
+          </GaugeContainer>
+        </Box>
+      </Item>
+      {/* Outside the tile: React passes clicks in a dialog up to its parents, and the tile's would reopen it. */}
+      <DetailDialog
+        open={showHistory}
+        onClose={() => setShowHistory(false)}
+        title="Where our electricity came from"
+        width={HISTORY_DIALOG_WIDTH}
+      >
+        <EnergyHistoryChart />
+      </DetailDialog>
+    </>
   );
 }

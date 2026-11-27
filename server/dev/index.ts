@@ -103,6 +103,7 @@ const mock = async () => {
     HA_URL: upstream,
     HA_TOKEN: 'mock',
     HEATING_STATE_FILE: path.join(stateDir, 'heating-state.json'),
+    ENERGY_HISTORY_FILE: path.join(stateDir, 'energy-history.json'),
     SMARTCAR_STATE_FILE: smartcarFile,
     SMARTCAR_WEBHOOK_ID: 'mock',
     SMART_CAR_CLIENT_ID: 'mock',

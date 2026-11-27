@@ -1,5 +1,6 @@
 import { MD5 } from 'bun';
 import { cached } from '../cache';
+import { type CalendarDay, londonDay } from '../calendar';
 import type { DeviceQueryBody, DeviceQueryResponse, FoxCloudResponse, ReportQueryResponse } from './types';
 
 const { FOXCLOUD_API_KEY, FOXCLOUD_SN } = process.env;
@@ -51,7 +52,7 @@ export const getValues = async (): Promise<Record<string, Datum>> => {
 // shares one recent response between displays and reloads.
 export const getCachedValues = cached(getValues, 60 * 1000);
 
-// Hour by hour for today, in kWh. Index 0 is 00:00-01:00 UK time. Hours still to come are 0.
+// Hour by hour for one day, in kWh. Index 0 is 00:00-01:00 UK time.
 export interface HourlyEnergy {
   // Solar generated. FoxCloud's 'generation' is the inverter's whole output, battery discharge included, so it
   // isn't used.
@@ -70,22 +71,15 @@ const REPORT_VARIABLES: Record<keyof HourlyEnergy, string> = {
   batteryDischarge: 'dischargeEnergyToTal',
 };
 
-const londonDate = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Europe/London',
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-});
-
-export const getTodayHourly = async (now = new Date()): Promise<HourlyEnergy> => {
-  const parts = Object.fromEntries(londonDate.formatToParts(now).map(p => [p.type, Number(p.value)]));
+// One day's hourly report. For today, hours still to come are 0.
+export const getHourly = async ({ year, month, day }: CalendarDay): Promise<HourlyEnergy> => {
   const res = await fetchAndSign('/op/v0/device/report/query', {
     method: 'POST',
     body: JSON.stringify({
       sn: FOXCLOUD_SN as string,
-      year: parts.year,
-      month: parts.month,
-      day: parts.day,
+      year,
+      month,
+      day,
       dimension: 'day',
       variables: Object.values(REPORT_VARIABLES),
     }),
@@ -105,6 +99,8 @@ export const getTodayHourly = async (now = new Date()): Promise<HourlyEnergy> =>
     Object.entries(REPORT_VARIABLES).map(([key, variable]) => [key, series(variable)]),
   ) as unknown as HourlyEnergy;
 };
+
+export const getTodayHourly = (now = new Date()) => getHourly(londonDay(now));
 
 // Hourly totals move slowly, and every call counts against FoxCloud's daily limit.
 export const getCachedTodayHourly = cached(() => getTodayHourly(), 10 * 60 * 1000);

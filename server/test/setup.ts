@@ -15,6 +15,7 @@ Object.assign(process.env, {
   EASEE_TOKEN_FILE: path.join(TEST_DIR, 'easee-tokens.json'),
   SMARTCAR_STATE_FILE: path.join(TEST_DIR, 'smartcar-state.json'),
   HEATING_STATE_FILE: path.join(TEST_DIR, 'heating-state.json'),
+  ENERGY_HISTORY_FILE: path.join(TEST_DIR, 'energy-history.json'),
   HA_URL: 'http://ha.test:8123',
   HA_TOKEN: 'test-ha-token',
   EASEE_CHARGER_ID: 'TESTCHARGER',

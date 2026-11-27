@@ -5,6 +5,7 @@ import { getChargingStatus } from './easee';
 import { keepTokensFresh } from './easee/auth';
 import { authoriseChargingHandler } from './easee/authorise';
 import { energySources } from './energy';
+import { getCachedEnergyHistory } from './energy/history';
 import { getCachedTodayHourly, getCachedValues, getVariables } from './foxcloud';
 import { startHeatingSchedule } from './heating';
 import { getHomeStatus } from './home';
@@ -60,6 +61,9 @@ Bun.serve({
           console.error('Failed to fetch dashboard values', err);
           return Response.json({ error: 'Upstream request failed' }, { status: 502 });
         }
+      }
+      case '/api/energy/history': {
+        return Response.json(await getCachedEnergyHistory());
       }
       case '/api/variables': {
         return Response.json(await getVariables());

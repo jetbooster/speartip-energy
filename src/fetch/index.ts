@@ -1,4 +1,4 @@
-import type { ValuesResponse } from '@/types/types';
+import type { EnergyDay, ValuesResponse } from '@/types/types';
 
 export const fetchValues = async (): Promise<ValuesResponse> => {
   const res = await fetch('/api/values');
@@ -15,4 +15,12 @@ export const authoriseCharging = async (key: string): Promise<number> => {
     headers: { 'X-Charge-Key': key },
   });
   return res.status;
+};
+
+export const fetchEnergyHistory = async (): Promise<EnergyDay[]> => {
+  const res = await fetch('/api/energy/history');
+  if (!res.ok) {
+    throw new Error(`Energy history request failed with status ${res.status}`);
+  }
+  return res.json();
 };
